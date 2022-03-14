@@ -27,11 +27,10 @@ class CalendarManagerImpl implements CalendarManager {
 
   CalendarManagerImpl._();
 
-  factory CalendarManagerImpl() => _instance;
+  factory CalendarManagerImpl() => _instance as CalendarManagerImpl;
 
   ///returns the calendarId
   Future<CalendarResult> createCalendar(CreateCalendar calendar) async {
-    assert(calendar != null);
     await requestPermissionsOrThrow();
     final String json = await _invokeMethod(
         'createCalendar', {"calendar": jsonEncode(calendar)});
@@ -39,7 +38,6 @@ class CalendarManagerImpl implements CalendarManager {
   }
 
   deleteAllEventsByCalendarId(calendarId) async {
-    assert(calendarId != null);
     await requestPermissionsOrThrow();
     final String json = await _invokeMethod(
         'deleteAllEventsByCalendarId', {"calendarId": calendarId});
@@ -55,7 +53,7 @@ class CalendarManagerImpl implements CalendarManager {
       throw CalendarManagerException(
           code: parseCalendarManagerErrorCode(ex.code),
           details: ex.details,
-          message: ex.message);
+          message: ex.message!);
     }
   }
 
@@ -98,8 +96,6 @@ class CalendarManagerImpl implements CalendarManager {
   }
 
   createEvents(events) async {
-    assert(events != null);
-    assert(events.every((event) => event != null));
     await requestPermissionsOrThrow();
     final results = <EventResult>[];
     for (final event in events) {
