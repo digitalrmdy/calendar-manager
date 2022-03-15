@@ -17,13 +17,11 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.internal.ArrayListSerializer
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 
 class CalendarManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 
-    private val json = Json(JsonConfiguration.Stable)
     private val delegate: CalendarManagerDelegate = CalendarManagerDelegate()
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -105,19 +103,19 @@ class CalendarManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
         println("handleMethod: $method")
         return when (method) {
             "createCalendar" -> {
-                val calendar = json.parse(CreateCalendar.serializer(), jsonArgs["calendar"] as String)
+                val calendar = Json.decodeFromString(CreateCalendar.serializer(), jsonArgs["calendar"] as String)
                 val createdCalender = delegate.createCalendar(calendar)
-                json.stringify(CalendarResult.serializer(), createdCalender)
+                Json.encodeToString(CalendarResult.serializer(), createdCalender)
             }
             "createEvent" -> {
-                val event = json.parse(Event.serializer(), jsonArgs["event"] as String)
+                val event = Json.decodeFromString(Event.serializer(), jsonArgs["event"] as String)
                val eventResult= delegate.createEvent(event)
-                json.stringify(EventResult.serializer(), eventResult)
+                Json.encodeToString(EventResult.serializer(), eventResult)
             }
             "deleteAllEventsByCalendarId" -> {
                 val calendarId = jsonArgs["calendarId"] as String
                val deletedEvents= delegate.deleteAllEventsByCalendarId(calendarId)
-                json.stringify(ArrayListSerializer(EventResult.serializer()), deletedEvents)
+                Json.encodeToString(ListSerializer(EventResult.serializer()), deletedEvents)
             }
             "requestPermissions" -> {
                 val granted: Boolean = delegate.requestPermissions()
@@ -125,7 +123,7 @@ class CalendarManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
             }
             "findAllCalendars" -> {
                 val calendars = delegate.findAllCalendars()
-                json.stringify(ArrayListSerializer(CalendarResult.serializer()), calendars)
+                Json.encodeToString(ListSerializer(CalendarResult.serializer()), calendars)
             }
             "deleteCalendar" -> {
                 val calendarId = jsonArgs["calendarId"] as String
