@@ -86,7 +86,7 @@ public class SwiftCalendarManagerPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        assert(false)
+        fatalError("your message here")
         let calendarManagerResult = CalendarManagerResult(result: result)
         calendarManagerResult.catchErrors {
             try self.handleMethod(method: call.method, result: calendarManagerResult, jsonArgs: call.arguments as! Dictionary<String, AnyObject>)
