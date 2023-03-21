@@ -41,7 +41,17 @@ protocol CalendarApi {
     func deleteCalendar(calendarId:String) throws
     func deleteAllEventsByCalendarId(calendarId:String) throws
 }
+struct RuntimeError: Error {
+    let message: String
 
+    init(_ message: String) {
+        self.message = message
+    }
+
+    public var localizedDescription: String {
+        message
+    }
+}
 
 public class SwiftCalendarManagerPlugin: NSObject, FlutterPlugin {
     let json = Json()
@@ -76,6 +86,7 @@ public class SwiftCalendarManagerPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        throw RuntimeError("test error")
         let calendarManagerResult = CalendarManagerResult(result: result)
         calendarManagerResult.catchErrors {
             try self.handleMethod(method: call.method, result: calendarManagerResult, jsonArgs: call.arguments as! Dictionary<String, AnyObject>)
