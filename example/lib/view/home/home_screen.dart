@@ -26,7 +26,7 @@ class HomeScreenContent extends StatelessWidget {
   }
 
   Widget createButton(String name, VoidCallback onPressed) {
-    return RaisedButton(
+    return ElevatedButton(
       key: Key(name.replaceAll(" ", "")),
       onPressed: onPressed,
       child: Text(name),

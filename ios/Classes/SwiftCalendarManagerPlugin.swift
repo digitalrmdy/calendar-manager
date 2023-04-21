@@ -147,11 +147,12 @@ public class CalendarManagerResult {
         case let error as NSException:
             return errorUnknown(message: error.userInfo?.debugDescription ?? error.reason, details: error.self)
         case let error as NSError:
-            return errorUnknown(message: error.userInfo?.debugDescription ?? error.reason, details: error.self)
+        let code = error.code
+            return errorUnknown(message: error.userInfo?.debugDescription ?? "code:\(code)", details: error.self)
         case let error as NSExceptionName:
             return (errorUnknown(message: error.rawValue, details: error.self))
         case let error as CocoaError:
-            return (errorUnknown(message: error.userInfo?.debugDescription ?? error.reason, details: error.self))
+            return (errorUnknown(message: error.userInfo?.debugDescription ?? error.errorUserInfo, details: error.self))
         case let error as Error:
             return (errorUnknown(message: error.localizedDescription, details: error.self))
         default:
