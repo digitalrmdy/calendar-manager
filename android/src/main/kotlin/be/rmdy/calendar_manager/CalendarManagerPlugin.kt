@@ -75,7 +75,7 @@ class CalendarManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
 
     private suspend fun sendBackResult(result: Result, call: MethodCall) {
         try {
-            var success = handleMethod(call.method, requireNotNull(call.arguments() as Map<String, Any?>) { "arguments = null" })
+            var success = handleMethod(call.method, requireNotNull(call.arguments()) { "arguments = null" })
             if (success == Unit) {
                 success = null
             }
