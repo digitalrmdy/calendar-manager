@@ -1,6 +1,6 @@
 name: calendar_manager
 description: A Flutter plugin for creating calenders and events for the device default calender.
-version: 0.0.8
+version: 0.0.9
 author:
 
 environment:

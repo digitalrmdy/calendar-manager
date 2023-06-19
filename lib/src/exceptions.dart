@@ -3,8 +3,7 @@ class CalendarManagerException implements Exception {
   final String? message;
   final dynamic details;
 
-  const CalendarManagerException(
-      {required this.code, this.message, this.details});
+  const CalendarManagerException({required this.code, this.message, this.details});
 
   @override
   String toString() {

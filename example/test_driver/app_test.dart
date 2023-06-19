@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 /// no main code allowed here
 void main() {
   group('Calender Manager', () {
-    FlutterDriver driver;
+    late FlutterDriver driver;
     final addEventFinder = find.byValueKey('addEvent');
     final loadingFinder = find.byValueKey('loading');
 
@@ -15,12 +15,10 @@ void main() {
 
     // Close the connection to the driver after the tests have completed.
     tearDownAll(() async {
-      if (driver != null) {
-        try {
-          driver.close();
-        } catch (e) {
-          print(e);
-        }
+      try {
+        driver.close();
+      } catch (e) {
+        print(e);
       }
     });
 

@@ -135,8 +135,9 @@ public class CalendarManagerResult {
         errorUnknown(message: errorDescription)
     }
 
-    public func errorJsonParse(errorDescription:String?,  typeLabel:String,  json:String?) {
-        errorUnknown(message:  "Failed to parse \(typeLabel) : \(json) reason: \(errorDescription)")
+    public func errorJsonParse(errorDescription:String?,  typeLabel:String,  json:String) {
+        let description = errorDescription ?? "--"
+        errorUnknown(message:  "Failed to parse \(typeLabel) : \(json) reason: \(description)")
     }
 
     public func errorUnknown(message:String?) {
@@ -277,7 +278,7 @@ public class CalendarManagerDelegate : CalendarApi {
             }
             catch {
                 let description = error.localizedDescription;
-                result.errorUnknown(message: "Failed to delete event: \(description)")
+                result.errorUnknown(message: "Failed to delete event for calendar \(calendarId): \(description)")
                 return
             }
         }
@@ -286,7 +287,7 @@ public class CalendarManagerDelegate : CalendarApi {
         }
         catch {
             let description = error.localizedDescription;
-            result.errorUnknown(message: "Failed to commit event store: \(description)")
+            result.errorUnknown(message: "Failed to commit event store for calendar \(calendarId): \(description)")
             return
         }
         let eventResults = events.map { (event) in
@@ -325,7 +326,9 @@ public class CalendarManagerDelegate : CalendarApi {
         }
         catch {
             let description = error.localizedDescription;
-            result.errorUnknown(message: "Failed to save calendar: \(description)")
+             let createCalendarJson = try? json.stringify(calendar)
+             let json = createCalendarJson as? String ?? calendar.name
+            result.errorUnknown(message: "Failed to save calendar (\(json)): \(description)")
             return
         }
         self.finishWithSuccess(ekCalendar.toCalendarResult())
@@ -388,8 +391,9 @@ public class CalendarManagerDelegate : CalendarApi {
         }
         catch {
             let description = error.localizedDescription;
-            let eventTitle = event.title ?? "Unknown"
-            result.errorUnknown(message: "Failed to save event (\(eventTitle)): \(description)")
+            let createEventJson = try? json.stringify(event)
+            let json = createEventJson as? String ?? event.title ?? "<unknown_title>"
+            result.errorUnknown(message: "Failed to save event (\(json)): \(description)")
             return nil
         }
         return ekEvent.toEventResult()
