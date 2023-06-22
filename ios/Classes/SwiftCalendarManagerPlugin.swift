@@ -457,7 +457,7 @@ public class CalendarManagerDelegate : CalendarApi {
 
    for source in self.eventStore.sources {
      // Check for iCloud
-     if source.sourceType == EKSourceType.calDAV && source.title == "iCloud" {
+     if source.sourceType == .calDAV && source.title == "iCloud" {
        // Check to see if Calendar is enabled on iCloud
        if source.calendars(for: .event).count > 0 {
          do {
@@ -472,7 +472,7 @@ public class CalendarManagerDelegate : CalendarApi {
    //If we are here it means that we did not find iCloud Source with iCloud Name. Now trying any CalDAV type to see if we can find it
    for source in self.eventStore.sources {
      //Check for iCloud
-     if source.sourceType == EKSourceType.calDAV {
+     if source.sourceType == .calDAV {
        do {
          try createCalendarAction(source)
          return
@@ -484,10 +484,11 @@ public class CalendarManagerDelegate : CalendarApi {
    //If we are here it means that we did not find iCloud and that means iCloud is not turned on. Use Local service now.
    for source in self.eventStore.sources {
      //Look for Local Source
-     if source.sourceType == EKSourceType.local {
+     if source.sourceType == .local {
        //Found Local Source
        // don't catch errors because this is the last attempt
        try createCalendarAction(source)
+       return
      }
    }
 
