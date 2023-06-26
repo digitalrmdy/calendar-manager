@@ -320,9 +320,12 @@ public class CalendarManagerDelegate : CalendarApi {
                                     eventStore: self.eventStore)
         ekCalendar.title = calendar.name
         ekCalendar.cgColor = calendar.color?.toCgColor()
-        ekCalendar.source = self.eventStore.defaultCalendarForNewEvents?.source
         do {
-            try self.eventStore.saveCalendar(ekCalendar, commit: true)
+            try tryCreateCalendar({
+            (source:EKSource?) -> () in
+             ekCalendar.source = source
+             try self.eventStore.saveCalendar(ekCalendar, commit: true)
+            })
         }
         catch {
             let description = error.localizedDescription;
@@ -443,6 +446,53 @@ public class CalendarManagerDelegate : CalendarApi {
         let status = EKEventStore.authorizationStatus(for: .event)
         return status == EKAuthorizationStatus.authorized
     }
+
+ private func tryCreateCalendar(_ createCalendarAction: @escaping (EKSource?) throws -> Void) throws {
+   let defaultSource = self.eventStore.defaultCalendarForNewEvents?.source
+   do {
+     try createCalendarAction(defaultSource)
+     return
+   } catch {
+   }
+
+   for source in self.eventStore.sources {
+     // Check for iCloud
+     if source.sourceType == .calDAV && source.title == "iCloud" {
+       // Check to see if Calendar is enabled on iCloud
+       if source.calendars(for: .event).count > 0 {
+         do {
+           try createCalendarAction(source)
+           return
+         } catch {
+         }
+       }
+     }
+   }
+
+   //If we are here it means that we did not find iCloud Source with iCloud Name. Now trying any CalDAV type to see if we can find it
+   for source in self.eventStore.sources {
+     //Check for iCloud
+     if source.sourceType == .calDAV {
+       do {
+         try createCalendarAction(source)
+         return
+       } catch {
+       }
+
+     }
+   }
+   //If we are here it means that we did not find iCloud and that means iCloud is not turned on. Use Local service now.
+   for source in self.eventStore.sources {
+     //Look for Local Source
+     if source.sourceType == .local {
+       //Found Local Source
+       // don't catch errors because this is the last attempt
+       try createCalendarAction(source)
+       return
+     }
+   }
+
+ }
 
 }
 public struct CalendarManagerError : Error {
