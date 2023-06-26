@@ -1,17 +1,21 @@
 package be.rmdy.calendar_manager.serializers
 
 import kotlinx.serialization.*
-import kotlinx.serialization.internal.StringDescriptor
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import java.util.*
 
+@ExperimentalSerializationApi
 @Serializer(forClass = Date::class)
 object DateSerializer : KSerializer<Date> {
 
-    override val descriptor: SerialDescriptor =
-            StringDescriptor.withName("date")
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("date", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, obj: Date) {
-        encoder.encodeLong(obj.time)
+    override fun serialize(encoder: Encoder, value: Date) {
+        encoder.encodeLong(value.time)
     }
 
     override fun deserialize(decoder: Decoder): Date {

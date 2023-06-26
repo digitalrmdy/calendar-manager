@@ -20,29 +20,25 @@ abstract class CalendarManager {
 }
 
 class CalendarManagerImpl implements CalendarManager {
-  static const MethodChannel _channel =
-      const MethodChannel('rmdy.be/calendar_manager');
+  static const MethodChannel _channel = const MethodChannel('rmdy.be/calendar_manager');
 
   static final CalendarManager _instance = CalendarManagerImpl._();
 
   CalendarManagerImpl._();
 
-  factory CalendarManagerImpl() => _instance;
+  factory CalendarManagerImpl() => _instance as CalendarManagerImpl;
 
   ///returns the calendarId
   Future<CalendarResult> createCalendar(CreateCalendar calendar) async {
-    assert(calendar != null);
     await requestPermissionsOrThrow();
-    final String json = await _invokeMethod(
-        'createCalendar', {"calendar": jsonEncode(calendar)});
+    final String json = await _invokeMethod('createCalendar', {"calendar": jsonEncode(calendar)});
     return CalendarResult.fromJson(jsonDecode(json));
   }
 
   deleteAllEventsByCalendarId(calendarId) async {
-    assert(calendarId != null);
     await requestPermissionsOrThrow();
-    final String json = await _invokeMethod(
-        'deleteAllEventsByCalendarId', {"calendarId": calendarId});
+    final String json =
+        await _invokeMethod('deleteAllEventsByCalendarId', {"calendarId": calendarId});
     Iterable results = jsonDecode(json);
     return results.map((e) => EventResult.fromJson(e)).toList();
   }
@@ -53,9 +49,7 @@ class CalendarManagerImpl implements CalendarManager {
       return result;
     } on PlatformException catch (ex) {
       throw CalendarManagerException(
-          code: parseCalendarManagerErrorCode(ex.code),
-          details: ex.details,
-          message: ex.message);
+          code: parseCalendarManagerErrorCode(ex.code), details: ex.details, message: ex.message);
     }
   }
 
@@ -75,8 +69,7 @@ class CalendarManagerImpl implements CalendarManager {
   Future<void> requestPermissionsOrThrow() async {
     bool granted = await requestPermissions();
     if (!granted) {
-      throw CalendarManagerException(
-          code: CalendarManagerErrorCode.PERMISSIONS_NOT_GRANTED);
+      throw CalendarManagerException(code: CalendarManagerErrorCode.PERMISSIONS_NOT_GRANTED);
     }
   }
 
@@ -92,14 +85,11 @@ class CalendarManagerImpl implements CalendarManager {
   }
 
   Future<EventResult> _createEvent(CreateEvent event) async {
-    final String json =
-        await _invokeMethod("createEvent", {"event": jsonEncode(event)});
+    final String json = await _invokeMethod("createEvent", {"event": jsonEncode(event)});
     return EventResult.fromJson(jsonDecode(json));
   }
 
   createEvents(events) async {
-    assert(events != null);
-    assert(events.every((event) => event != null));
     await requestPermissionsOrThrow();
     final results = <EventResult>[];
     for (final event in events) {

@@ -8,7 +8,7 @@ import io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener
 interface BindingDelegate {
     fun removeRequestPermissionsResultListener(listener: RequestPermissionsResultListener)
     fun addRequestPermissionsResultListener(listener: RequestPermissionsResultListener)
-    val activity: Activity
+    val activity: Activity?
 
     companion object {
         fun activityPluginBinding(activityPluginBinding: ActivityPluginBinding): BindingDelegate = ActivityBindingDelegate(activityPluginBinding)
@@ -17,7 +17,7 @@ interface BindingDelegate {
 }
 
 class RegistrarBindingDelegate(private val registrar: Registrar) : BindingDelegate {
-    override val activity: Activity
+    override val activity: Activity?
         get() = registrar.activity()
 
     override fun removeRequestPermissionsResultListener(listener: RequestPermissionsResultListener) {

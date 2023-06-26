@@ -1,13 +1,9 @@
-import 'package:flutter/cupertino.dart';
-
 class CalendarManagerException implements Exception {
   final CalendarManagerErrorCode code;
-  final String message;
+  final String? message;
   final dynamic details;
 
-  const CalendarManagerException(
-      {@required this.code, this.message, this.details})
-      : assert(code != null);
+  const CalendarManagerException({required this.code, this.message, this.details});
 
   @override
   String toString() {

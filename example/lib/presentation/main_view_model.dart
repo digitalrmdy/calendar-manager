@@ -1,4 +1,5 @@
 import 'package:calendar_manager/calendar_manager.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class ViewModel extends ChangeNotifier {}
@@ -35,7 +36,7 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
     isLoading = true;
     notifyListeners();
     try {
-      return await call();
+      await call();
     } catch (ex, s) {
       print('crash catch:');
       print(ex);
@@ -50,9 +51,11 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
   @override
   Future<void> onDeleteAllEventsClick() async {
     final calendar = await findCalendar();
+    if (calendar == null) {
+      throw Exception('no calendar found');
+    }
     print('calendar: $calendar');
-    final deletedEvents =
-        await calendarManager.deleteAllEventsByCalendarId(calendar.id);
+    final deletedEvents = await calendarManager.deleteAllEventsByCalendarId(calendar.id!);
     final count = deletedEvents.length;
     print("deleted events $count: $deletedEvents");
   }
@@ -63,18 +66,19 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
             name: TEST_CALENDAR_NAME,
             color: TEST_COLOR,
             androidInfo: const CreateCalendarAndroidInfo(id: TEST_CALENDAR_ID));
-        final CalendarResult calendarResult =
-            await calendarManager.createCalendar(createCalendar);
-        print(
-            "cal result color: ${calendarResult.color} , test color: $TEST_COLOR");
+        final CalendarResult calendarResult = await calendarManager.createCalendar(createCalendar);
+        print("cal result color: ${calendarResult.color} , test color: $TEST_COLOR");
         assert(calendarResult.color == TEST_COLOR);
       });
 
   @override
   Future<void> onCreateEventClick() => doCall(() async {
         final calendar = await findCalendar();
+        if (calendar == null) {
+          throw Exception('no calendar found');
+        }
         final event = CreateEvent(
-          calendarId: calendar.id,
+          calendarId: calendar.id!,
           title: "Calendar plugin works!",
           startDate: DateTime.now().add(Duration(hours: 1)),
           endDate: DateTime.now().add(Duration(hours: 2)),
@@ -85,7 +89,7 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
         final currentDate = DateTime.now();
         var date = currentDate.plusYear(4).subtract(Duration(days: 2));
         final event2 = CreateEvent(
-          calendarId: calendar.id,
+          calendarId: calendar.id!,
           title: "Event 2",
           startDate: date.add(Duration(hours: 1)),
           endDate: date.add(Duration(hours: 2)),
@@ -95,7 +99,7 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
 
         date = currentDate.plusYear(-4).add(Duration(hours: 1));
         final event3 = CreateEvent(
-          calendarId: calendar.id,
+          calendarId: calendar.id!,
           title: "Event 3",
           startDate: date.add(Duration(hours: 1)),
           endDate: date.add(Duration(hours: 2)),
@@ -107,12 +111,11 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
         print('creating events: $results');
       });
 
-  Future<CalendarResult> findCalendar() async {
-    final List<CalendarResult> calendars =
-        await calendarManager.findAllCalendars();
+  Future<CalendarResult?> findCalendar() async {
+    final List<CalendarResult> calendars = await calendarManager.findAllCalendars();
     print("calendars: $calendars");
-    final calendar = calendars.firstOrNull(
-        (cal) => cal.id == TEST_CALENDAR_ID || cal.name == TEST_CALENDAR_NAME);
+    final calendar = calendars
+        .firstWhereOrNull((cal) => cal.id == TEST_CALENDAR_ID || cal.name == TEST_CALENDAR_NAME);
     return calendar;
   }
 
@@ -120,7 +123,7 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
   Future<void> onDeleteCalendarClick() => doCall(() async {
         final calendar = await findCalendar();
         if (calendar != null)
-          await calendarManager.deleteCalendar(calendar.id);
+          await calendarManager.deleteCalendar(calendar.id!);
         else
           print('calendar not found');
       });
@@ -132,13 +135,7 @@ class MainViewModelImpl extends ViewModel implements MainViewModel {
   }
 }
 
-extension<T> on Iterable<T> {
-  T firstOrNull(bool test(T element)) {
-    return this.firstWhere(test, orElse: () => null);
-  }
-}
-
 extension on DateTime {
-  DateTime plusYear(int year) => DateTime(this.year + year, this.month,
-      this.day, this.hour, this.minute, this.second);
+  DateTime plusYear(int year) =>
+      DateTime(this.year + year, this.month, this.day, this.hour, this.minute, this.second);
 }
