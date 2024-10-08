@@ -36,8 +36,6 @@ class HomeScreenContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MainViewModel viewModel = Provider.of(context);
-    assert(viewModel != null);
-    assert(viewModel.isLoading != null);
     if (viewModel.isLoading) {
       return buildLoading();
     }
