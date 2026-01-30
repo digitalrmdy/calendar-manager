@@ -13,7 +13,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,37 +26,15 @@ class CalendarManagerPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         val channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
         channel.setMethodCallHandler(this.init(flutterPluginBinding))
-
-    }
-
-    private fun init(registrar: Registrar) = apply {
-        delegate.context = registrar.context()
-        onNewBindingDelegate(BindingDelegate.registrar(registrar))
     }
 
     private fun init(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) = apply {
         delegate.context = flutterPluginBinding.applicationContext
     }
 
-    // This static function is optional and equivalent to onAttachedToEngine. It supports the old
-    // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
-    // plugin registration via this function while apps migrate to use the new Android APIs
-    // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
-    //
-    // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
-    // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
-    // depending on the user's project. onAttachedToEngine or registerWith must both be defined
-    // in the same class.
     companion object {
         const val TAG = "CalendarManagerPlugin"
         const val CHANNEL_NAME = "rmdy.be/calendar_manager"
-        @Suppress("unused")
-        @JvmStatic
-        //for backwards compatibility
-        fun registerWith(registrar: Registrar) {
-            val channel = MethodChannel(registrar.messenger(), CHANNEL_NAME)
-            channel.setMethodCallHandler(CalendarManagerPlugin().init(registrar))
-        }
     }
 
     private fun assertMainThread() {
